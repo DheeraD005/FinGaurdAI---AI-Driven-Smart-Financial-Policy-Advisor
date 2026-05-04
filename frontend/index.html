@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>FinGuard AI – Smart Financial Advisor</title>
+<meta name="description" content="FinGuard AI – AI-powered financial advisor with RAG, live market data, calculators and budget planner."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="/static/style.css"/>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="logo">
+    <div class="logo-shield">FG</div>
+    <div><div class="logo-name">FinGuard AI</div><div class="logo-sub">Smart Financial Advisor</div></div>
+  </div>
+  <nav class="nav">
+    <button class="nav-btn active" data-tab="chat"   onclick="showTab('chat',this)">  <span class="nav-icon">FG</span><span>Ask FinGuard</span></button>
+    <button class="nav-btn"        data-tab="market" onclick="showTab('market',this)"><span class="nav-icon">MK</span><span>Live Market</span></button>
+    <button class="nav-btn"        data-tab="tools"  onclick="showTab('tools',this)"> <span class="nav-icon">CA</span><span>Calculators</span></button>
+    <button class="nav-btn"        data-tab="budget" onclick="showTab('budget',this)"><span class="nav-icon">BP</span><span>Budget Planner</span></button>
+    <button class="nav-btn"        data-tab="kb"     onclick="showTab('kb',this)">    <span class="nav-icon">KB</span><span>Knowledge Base</span></button>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="health-dot" id="healthDot"></div>
+    <span id="healthLabel">Checking...</span>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">&#9776;</button>
+    <div class="topbar-title" id="topbarTitle">Ask FinGuard</div>
+    <div class="topbar-right">
+      <span class="badge" id="kbBadge">KB: —</span>
+      <button class="btn-icon" onclick="newChat()" title="New Chat">New</button>
+    </div>
+  </header>
+
+  <!-- TAB: CHAT -->
+  <section class="tab active" id="tab-chat">
+    <div class="chat-wrap">
+      <div class="chat-messages" id="chatMessages">
+        <div class="msg ai">
+          <div class="avatar">FG</div>
+          <div class="bubble">
+            <p>Welcome to <strong>FinGuard AI</strong>! I'm your personal financial advisor.</p>
+            <p>Ask me about <strong>SIP, stocks, tax saving, budgeting, EMI, mutual funds</strong>.</p>
+            <div class="quick-chips">
+              <button onclick="sendQuick('What is SIP and how does it work?')">What is SIP?</button>
+              <button onclick="sendQuick('How to save tax in India?')">Tax saving tips</button>
+              <button onclick="sendQuick('Best mutual funds for beginners?')">Best mutual funds</button>
+              <button onclick="sendQuick('What is the 50-30-20 rule?')">50-30-20 rule</button>
+              <button onclick="sendQuick('Explain P/E ratio')">P/E ratio</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <div class="input-wrap">
+          <textarea id="chatInput" placeholder="Ask anything about finance..." rows="1" onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+          <button class="send-btn" id="sendBtn" onclick="sendMessage()">Send</button>
+        </div>
+        <div class="input-hint">Press <kbd>Enter</kbd> to send &middot; <kbd>Shift+Enter</kbd> for new line</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: MARKET -->
+  <section class="tab" id="tab-market">
+    <div class="page-header"><h1>Live Market</h1><button class="btn-refresh" onclick="loadMarket()">Refresh</button></div>
+    <div class="indices-grid" id="indicesGrid"><div class="loading-pulse">Loading market data...</div></div>
+    <div class="stock-lookup">
+      <h2>Stock Lookup</h2>
+      <div class="lookup-row">
+        <input id="stockSymbol" placeholder="Enter symbol e.g. AAPL, RELIANCE.NS, TCS.NS" class="input-field"/>
+        <button class="btn-primary" onclick="lookupStock()">Search</button>
+      </div>
+      <div id="stockResult"></div>
+    </div>
+  </section>
+
+  <!-- TAB: CALCULATORS -->
+  <section class="tab" id="tab-tools">
+    <div class="page-header"><h1>Financial Calculators</h1></div>
+    <div class="tools-grid">
+      <div class="calc-card">
+        <div class="calc-header">SIP Calculator</div>
+        <label>Monthly Investment (Rs)<input id="sipAmt" type="number" value="5000" class="input-field"/></label>
+        <label>Annual Return (%)<input id="sipRate" type="number" value="12" step="0.1" class="input-field"/></label>
+        <label>Duration (Years)<input id="sipYrs" type="number" value="10" class="input-field"/></label>
+        <button class="btn-primary" onclick="calcSIP()">Calculate</button>
+        <div class="calc-result" id="sipResult"></div>
+      </div>
+      <div class="calc-card">
+        <div class="calc-header">EMI Calculator</div>
+        <label>Loan Amount (Rs)<input id="emiPrin" type="number" value="1000000" class="input-field"/></label>
+        <label>Annual Rate (%)<input id="emiRate" type="number" value="8.5" step="0.1" class="input-field"/></label>
+        <label>Tenure (Years)<input id="emiYrs" type="number" value="20" class="input-field"/></label>
+        <button class="btn-primary" onclick="calcEMI()">Calculate</button>
+        <div class="calc-result" id="emiResult"></div>
+      </div>
+      <div class="calc-card">
+        <div class="calc-header">Compound Interest</div>
+        <label>Principal (Rs)<input id="ciPrin" type="number" value="100000" class="input-field"/></label>
+        <label>Annual Rate (%)<input id="ciRate" type="number" value="7" step="0.1" class="input-field"/></label>
+        <label>Duration (Years)<input id="ciYrs" type="number" value="5" class="input-field"/></label>
+        <label>Compounds/Year<input id="ciN" type="number" value="12" class="input-field"/></label>
+        <button class="btn-primary" onclick="calcCI()">Calculate</button>
+        <div class="calc-result" id="ciResult"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB: BUDGET PLANNER -->
+  <section class="tab" id="tab-budget">
+    <div class="page-header"><h1>Budget Planner</h1><button class="btn-refresh" onclick="resetBudget()">Reset</button></div>
+    <div class="budget-layout">
+
+      <!-- Left: Input Panel -->
+      <div class="budget-input-panel">
+        <div class="calc-card">
+          <div class="calc-header">Monthly Income</div>
+          <label>Total Income (Rs)
+            <input id="budgetIncome" type="number" value="50000" class="input-field" oninput="updateBudgetPreview()"/>
+          </label>
+        </div>
+        <div class="calc-card">
+          <div class="calc-header">Expenses</div>
+          <div id="expenseList"></div>
+          <div class="add-expense-row">
+            <input id="expCat" placeholder="Category (e.g. Rent)" class="input-field"/>
+            <input id="expAmt" type="number" placeholder="Amount" class="input-field" style="width:120px"/>
+            <button class="btn-primary" onclick="addExpense()">Add</button>
+          </div>
+        </div>
+        <button class="btn-primary" style="width:100%" onclick="analyzeBudget()">Analyze Budget</button>
+      </div>
+
+      <!-- Right: Result Panel -->
+      <div class="budget-result-panel" id="budgetResult">
+        <div class="budget-placeholder">
+          <div class="bp-icon">BP</div>
+          <p>Add your income and expenses, then click Analyze Budget to see your financial health.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TAB: KB -->
+  <section class="tab" id="tab-kb">
+    <div class="page-header"><h1>Knowledge Base</h1><button class="btn-danger" onclick="clearKB()">Clear KB</button></div>
+    <div id="kbStats" class="kb-stats-wrap"><div class="loading-pulse">Loading...</div></div>
+  </section>
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
