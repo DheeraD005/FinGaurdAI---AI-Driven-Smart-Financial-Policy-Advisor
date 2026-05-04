@@ -81,22 +81,6 @@ Open a browser and go to:
 [http://127.0.0.1:5000/](http://127.0.0.1:5000/)
 
 ---
-
-## Project Structure
-
-finguard/
-│
-├── static/              (CSS, JavaScript, assets)
-├── templates/           (HTML files)
-├── models/              (Machine learning models)
-├── app.py               (Main application file)
-├── database/            (Database files)
-├── utils/               (Helper modules)
-├── requirements.txt
-└── README.md
-
----
-
 ## Future Enhancements
 
 * Integration with banking APIs
